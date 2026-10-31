@@ -1,0 +1,22 @@
+{
+  "name": "hint-selectors",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Community-maintained per-site CSS selectors for keyboard link hints",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "fmt": "prettier --write .",
+    "fmt:check": "prettier --check ."
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "css-what": "8.0.0"
+  },
+  "devDependencies": {
+    "prettier": "3.9.10"
+  }
+}
