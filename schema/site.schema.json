@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/Swarsel/hint-selectors/main/schema/site.schema.json",
+  "title": "Hint selectors for one site",
+  "type": "object",
+  "required": ["domain", "rules"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "domain": {
+      "description": "Registrable domain this file covers; rules apply to it and all of its subdomains.",
+      "type": "string",
+      "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$"
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/rule" }
+    }
+  },
+  "$defs": {
+    "selector": {
+      "description": "A CSS selector list, matched per element (shadow DOM boundaries cannot be crossed by combinators).",
+      "type": "string",
+      "minLength": 1
+    },
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "anyOf": [{ "required": ["include"] }, { "required": ["sets"] }],
+      "properties": {
+        "match": {
+          "description": "WebExtension match patterns limiting the rule to some pages; omitted means the whole domain.",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "pattern": "^(\\*|https?)://(\\*|(\\*\\.)?[^/*:]+)/.*$"
+          }
+        },
+        "include": {
+          "description": "Elements to hint in addition to the browser's default hintable elements.",
+          "$ref": "#/$defs/selector"
+        },
+        "sets": {
+          "description": "Named selector sets that are hinted exclusively, e.g. only the main links of a page.",
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "primary": { "$ref": "#/$defs/selector" }
+          }
+        }
+      }
+    }
+  }
+}
