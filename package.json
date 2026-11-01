@@ -9,6 +9,7 @@
     "node": ">=22.18"
   },
   "scripts": {
+    "check": "node scripts/check.ts",
     "test": "node --test \"test/*.test.ts\"",
     "fmt": "prettier --write .",
     "fmt:check": "prettier --check ."
