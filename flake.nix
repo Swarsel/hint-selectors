@@ -34,13 +34,53 @@
         inputs.pedantix.flakeModules.default
       ];
       perSystem =
-        { config, pkgs, ... }:
         {
+          config,
+          lib,
+          pkgs,
+          ...
+        }:
+        {
+          checks.hint-selectors = config.packages.hint-selectors;
           devShells.default = pkgs.mkShell {
             packages = [
               config.treefmt.build.wrapper
               pkgs.nodejs_24
             ];
+          };
+          packages = {
+            default = config.packages.hint-selectors;
+            hint-selectors = pkgs.buildNpmPackage {
+              checkPhase = ''
+                runHook preCheck
+                npm run check
+                npm test
+                runHook postCheck
+              '';
+              doCheck = true;
+              installPhase = ''
+                runHook preInstall
+                cp -r dist $out
+                runHook postInstall
+              '';
+              nodejs = pkgs.nodejs_24;
+              npmBuildScript = "build";
+              npmDepsHash = "sha256-9sq73q+tMheFawZtgSNzj5RqPHRevtC/Wl6Jcj5JTaQ=";
+              pname = "hint-selectors";
+              src = lib.fileset.toSource {
+                fileset = lib.fileset.unions [
+                  ./package-lock.json
+                  ./package.json
+                  ./schema
+                  ./scripts
+                  ./sites
+                  ./src
+                  ./test
+                ];
+                root = ./.;
+              };
+              version = (lib.importJSON ./package.json).version;
+            };
           };
           treefmt = {
             programs = {
