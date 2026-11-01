@@ -1,0 +1,14 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "github.com",
+  "rules": [
+    {
+      "include": "[class*=\"TreeView-item-content-text\"]"
+    },
+    {
+      "sets": {
+        "primary": "a.Link--primary, [data-listview-item-title-container] a, [class*=\"ActionList-ItemLabel\"], [class*=\"TreeView-item-content-text\"]"
+      }
+    }
+  ]
+}

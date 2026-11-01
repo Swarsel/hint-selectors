@@ -1,0 +1,12 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "ycombinator.com",
+  "rules": [
+    {
+      "match": ["*://news.ycombinator.com/*"],
+      "sets": {
+        "primary": ".titleline > a, .age > a"
+      }
+    }
+  ]
+}

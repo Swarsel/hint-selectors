@@ -1,0 +1,12 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "google.com",
+  "rules": [
+    {
+      "match": ["*://www.google.com/search*"],
+      "sets": {
+        "primary": "#search a:has(> h3), a.fl, #pnnext"
+      }
+    }
+  ]
+}

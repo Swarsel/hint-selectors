@@ -1,0 +1,11 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "lobste.rs",
+  "rules": [
+    {
+      "sets": {
+        "primary": "a.u-url, .comments_label > a"
+      }
+    }
+  ]
+}

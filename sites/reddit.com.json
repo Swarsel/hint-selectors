@@ -1,0 +1,11 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "reddit.com",
+  "rules": [
+    {
+      "sets": {
+        "primary": "a.title, a.bylink.comments"
+      }
+    }
+  ]
+}
