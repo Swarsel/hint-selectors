@@ -50,6 +50,9 @@
           };
           packages = {
             default = config.packages.hint-selectors;
+            glide-integration = pkgs.runCommand "hint-selectors.glide.ts" { } ''
+              cp ${config.packages.hint-selectors}/hint-selectors.glide.ts $out
+            '';
             hint-selectors = pkgs.buildNpmPackage {
               checkPhase = ''
                 runHook preCheck
@@ -69,6 +72,7 @@
               pname = "hint-selectors";
               src = lib.fileset.toSource {
                 fileset = lib.fileset.unions [
+                  ./integrations
                   ./package-lock.json
                   ./package.json
                   ./schema

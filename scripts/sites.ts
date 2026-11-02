@@ -19,6 +19,10 @@ export async function read_site_files(): Promise<SiteFile[]> {
   );
 }
 
+export async function resolve_source(): Promise<string> {
+  return (await readFile(join(ROOT, "src", "resolve.ts"), "utf8")).replace(/^export /gm, "");
+}
+
 export function to_dataset(sites: Site[]): Dataset {
   return {
     format: 1,
