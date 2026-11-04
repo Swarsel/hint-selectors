@@ -1,0 +1,11 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "tildes.net",
+  "rules": [
+    {
+      "sets": {
+        "primary": ".topic-title a, .topic-info-comments a"
+      }
+    }
+  ]
+}

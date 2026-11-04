@@ -3,11 +3,8 @@
   "domain": "github.com",
   "rules": [
     {
-      "include": "[class*=\"TreeView-item-content-text\"]"
-    },
-    {
       "sets": {
-        "primary": "a.Link--primary, [data-listview-item-title-container] a, [class*=\"ActionList-ItemLabel\"], [class*=\"TreeView-item-content-text\"]"
+        "primary": "a.Link--primary:not(.author):not(.assignee), [data-listview-item-title-container] a, [class*=\"ActionList-ItemLabel\"], [class*=\"TreeView-item-content-text\"], a[itemprop=\"name codeRepository\"], .pinned-item-list-item a.Link, .search-title a, .Box-row h2 a, h3.f3 a.text-bold, a.width-full[href*=\"/actions/runs/\"], dialog a.ActionListContent"
       }
     }
   ]

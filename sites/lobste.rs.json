@@ -4,7 +4,7 @@
   "rules": [
     {
       "sets": {
-        "primary": "a.u-url, .comments_label > a"
+        "primary": "a.u-url, .comments_label > a, .morelink a, .comment .byline a[href^=\"/s/\"]"
       }
     }
   ]

@@ -1,0 +1,11 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "youtube.com",
+  "rules": [
+    {
+      "sets": {
+        "primary": "a#video-title-link, a#video-title, a.ytLockupMetadataViewModelTitle, a.shortsLockupViewModelHostOutsideMetadataEndpoint"
+      }
+    }
+  ]
+}

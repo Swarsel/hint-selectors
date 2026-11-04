@@ -1,0 +1,24 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "arxiv.org",
+  "rules": [
+    {
+      "match": ["*://arxiv.org/list/*"],
+      "sets": {
+        "primary": "dt a[title=\"Abstract\"], dt a[title=\"Download PDF\"]"
+      }
+    },
+    {
+      "match": ["*://arxiv.org/search/*"],
+      "sets": {
+        "primary": ".list-title a"
+      }
+    },
+    {
+      "match": ["*://arxiv.org/abs/*"],
+      "sets": {
+        "primary": "a.abs-button"
+      }
+    }
+  ]
+}

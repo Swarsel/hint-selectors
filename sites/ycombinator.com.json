@@ -5,7 +5,7 @@
     {
       "match": ["*://news.ycombinator.com/*"],
       "sets": {
-        "primary": ".titleline > a, .age > a"
+        "primary": ".titleline > a, .age > a, a.morelink"
       }
     }
   ]

@@ -1,0 +1,11 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "codeberg.org",
+  "rules": [
+    {
+      "sets": {
+        "primary": "#repo-files-table td.name a, a.issue-title, a.text.primary.name"
+      }
+    }
+  ]
+}

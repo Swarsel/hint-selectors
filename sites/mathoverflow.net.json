@@ -1,0 +1,11 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "mathoverflow.net",
+  "rules": [
+    {
+      "sets": {
+        "primary": ".s-post-summary--content-title a, a.question-hyperlink"
+      }
+    }
+  ]
+}

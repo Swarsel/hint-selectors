@@ -1,0 +1,11 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "duckduckgo.com",
+  "rules": [
+    {
+      "sets": {
+        "primary": "a[data-testid=\"result-title-a\"], a.result__a:not(.related-searches__link)"
+      }
+    }
+  ]
+}

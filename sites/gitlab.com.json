@@ -1,0 +1,11 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "gitlab.com",
+  "rules": [
+    {
+      "sets": {
+        "primary": "a[data-testid=\"issuable-title-link\"], a[data-testid=\"file-name-link\"]"
+      }
+    }
+  ]
+}

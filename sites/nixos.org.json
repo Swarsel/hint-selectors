@@ -1,0 +1,19 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "nixos.org",
+  "rules": [
+    {
+      "match": ["*://search.nixos.org/*"],
+      "include": ".search-result-title a",
+      "sets": {
+        "primary": ".search-result-title a"
+      }
+    },
+    {
+      "match": ["*://discourse.nixos.org/*"],
+      "sets": {
+        "primary": "a.raw-topic-link"
+      }
+    }
+  ]
+}

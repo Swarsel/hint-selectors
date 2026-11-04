@@ -1,0 +1,12 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "docs.rs",
+  "rules": [
+    {
+      "match": ["*://docs.rs/releases/*"],
+      "sets": {
+        "primary": "a.release"
+      }
+    }
+  ]
+}

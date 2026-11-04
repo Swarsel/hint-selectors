@@ -1,0 +1,12 @@
+{
+  "$schema": "../schema/site.schema.json",
+  "domain": "haskell.org",
+  "rules": [
+    {
+      "match": ["*://hackage.haskell.org/*"],
+      "sets": {
+        "primary": "td a[href^=\"/package/\"]"
+      }
+    }
+  ]
+}

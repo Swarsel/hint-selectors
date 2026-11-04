@@ -4,7 +4,7 @@
   "rules": [
     {
       "sets": {
-        "primary": "a.title, a.bylink.comments"
+        "primary": "a.title, a.bylink.comments, a[slot=\"title\"], a.post-link, a[data-testid=\"post-title\"]"
       }
     }
   ]
