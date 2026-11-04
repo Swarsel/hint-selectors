@@ -11,6 +11,7 @@ Every domain is handled by a `sites/<domain>.json` file that holds all rules for
   "domain": "github.com",
   "rules": [
     { "include": "[class*=\"TreeView-item-content-text\"]" },
+    { "exclude": "footer" },
     {
       "match": ["*://github.com/*/issues*"],
       "sets": { "primary": "[data-listview-item-title-container] a" }
@@ -20,6 +21,7 @@ Every domain is handled by a `sites/<domain>.json` file that holds all rules for
 ```
 
 - `include`: hinted in addition to the default hintable elements
+- `exclude`: removed from the default hintable elements and from `include`
 - `sets.primary`: hinted exclusively, the main links of a page
 - `match`: optional [match patterns](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Match_patterns) limiting a rule to some pages
 
@@ -41,9 +43,10 @@ By default, `f` and `F` show the default hints plus the site's `include`.
 
 `setup` can be customized:
 
-- `keys.include`: keys showing the default hints plus `include` + optional hint action
+- `keys.include`: keys showing the default hints plus `include` minus `exclude` + optional hint
+  action
 - `keys.primary`: key hinting only the `primary` set, unbound by default
-- `hint`: receives `{ selector?, include?, action? }`, to route through your own hint function
+- `hint`: receives `{ selector?, include?, exclude?, action? }`, to route through your own hint function
 - `extra`: local rules, keyed by domain
 - `remote`: fetch updates instead of only using only the bundled data (off by default)
 

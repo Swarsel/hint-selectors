@@ -12,6 +12,7 @@ const BUNDLED: Dataset = { format: 1, sites: {} };
 type HintOptions = {
   selector?: string;
   include?: string;
+  exclude?: string;
   action?: glide.HintAction;
 };
 
@@ -26,7 +27,10 @@ type HintSelectorsOptions = {
 
 declare global {
   interface GlideGlobals {
-    hint_selectors?: { setup(opts?: HintSelectorsOptions): void };
+    hint_selectors?: {
+      setup(opts?: HintSelectorsOptions): void;
+      exclude_picker(exclude: string): glide.HintPicker;
+    };
   }
 }
 
@@ -76,8 +80,21 @@ async function update(url: string) {
   await glide.fs.write(CACHE_PATH, JSON.stringify({ fetched_at, data }));
 }
 
+function exclude_picker(exclude: string): glide.HintPicker {
+  const source = `(element) => element.closest(${JSON.stringify(exclude)}) !== null`;
+  const excluded = (_element: HTMLElement): boolean => false;
+  excluded.toString = () => source;
+  return async ({ hints, content }) => {
+    const hidden = await content.map(excluded);
+    return hints.filter((_, index) => !hidden[index]);
+  };
+}
+
 function setup(opts: HintSelectorsOptions = {}) {
-  const hint = opts.hint ?? ((hint_opts: HintOptions) => glide.hints.show(hint_opts));
+  const hint =
+    opts.hint ??
+    (({ exclude, ...hint_opts }: HintOptions) =>
+      glide.hints.show(exclude ? { ...hint_opts, pick: exclude_picker(exclude) } : hint_opts));
   const include_keys = opts.keys?.include ?? [{ key: "f" }, { key: "F", action: "newtab-click" }];
   const remote = opts.remote
     ? { url: DEFAULT_REMOTE_URL, refresh_hours: 24, ...opts.remote }
@@ -110,10 +127,10 @@ function setup(opts: HintSelectorsOptions = {}) {
     if (!resolved) {
       return;
     }
-    const include = resolved.include;
-    if (include) {
+    const { include, exclude } = resolved;
+    if (include || exclude) {
       for (const { key, action } of include_keys) {
-        glide.buf.keymaps.set("normal", key, () => hint({ include, action }));
+        glide.buf.keymaps.set("normal", key, () => hint({ include, exclude, action }));
       }
     }
     for (const name of SET_NAMES) {
@@ -133,4 +150,4 @@ function setup(opts: HintSelectorsOptions = {}) {
   }
 }
 
-glide.g.hint_selectors = { setup };
+glide.g.hint_selectors = { setup, exclude_picker };

@@ -38,6 +38,9 @@ for (const { file, json } of await read_site_files()) {
     if (rule.include) {
       check_selector(file, `${where}/include`, rule.include);
     }
+    if (rule.exclude) {
+      check_selector(file, `${where}/exclude`, rule.exclude);
+    }
     for (const name of SET_NAMES) {
       const selector = rule.sets?.[name];
       if (selector) {

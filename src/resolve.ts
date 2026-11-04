@@ -3,6 +3,7 @@ export type SetName = "primary";
 export type Rule = {
   match?: string[];
   include?: string;
+  exclude?: string;
   sets?: Partial<Record<SetName, string>>;
 };
 
@@ -12,6 +13,7 @@ export type Dataset = { format: 1; sites: Sites };
 
 export type Resolved = {
   include?: string;
+  exclude?: string;
   sets: Partial<Record<SetName, string>>;
 };
 
@@ -79,6 +81,7 @@ export function resolve(sites: Sites, url: string): Resolved | null {
   const host = parts[2]!.toLowerCase();
   const target = url.split("#")[0]!;
   const include: string[] = [];
+  const exclude: string[] = [];
   const sets: Partial<Record<SetName, string[]>> = {};
   let matched = false;
   for (const [domain, rules] of Object.entries(sites)) {
@@ -93,6 +96,9 @@ export function resolve(sites: Sites, url: string): Resolved | null {
       if (rule.include) {
         include.push(rule.include);
       }
+      if (rule.exclude) {
+        exclude.push(rule.exclude);
+      }
       for (const name of SET_NAMES) {
         const selector = rule.sets?.[name];
         if (selector) {
@@ -104,10 +110,20 @@ export function resolve(sites: Sites, url: string): Resolved | null {
   if (!matched) {
     return null;
   }
-  return {
-    include: include.length > 0 ? include.join(", ") : undefined,
+  const resolved: Resolved = {
     sets: Object.fromEntries(
       Object.entries(sets).map(([name, selectors]) => [name, selectors.join(", ")]),
     ),
   };
+  if (include.length > 0) {
+    resolved.include = include.join(", ");
+  }
+  if (exclude.length > 0) {
+    resolved.exclude = exclude.join(", ");
+  }
+  return resolved;
+}
+
+export function apply_exclude(selector: string, exclude: string): string {
+  return `:is(${selector}):not(:is(${exclude}), :is(${exclude}) *)`;
 }

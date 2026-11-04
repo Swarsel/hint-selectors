@@ -27,7 +27,7 @@
     "rule": {
       "type": "object",
       "additionalProperties": false,
-      "anyOf": [{ "required": ["include"] }, { "required": ["sets"] }],
+      "anyOf": [{ "required": ["include"] }, { "required": ["exclude"] }, { "required": ["sets"] }],
       "properties": {
         "match": {
           "description": "WebExtension match patterns limiting the rule to some pages; omitted means the whole domain.",
@@ -40,6 +40,10 @@
         },
         "include": {
           "description": "Elements to hint in addition to the browser's default hintable elements.",
+          "$ref": "#/$defs/selector"
+        },
+        "exclude": {
+          "description": "Elements to remove from the default hintable elements and from `include`, together with everything inside them.",
           "$ref": "#/$defs/selector"
         },
         "sets": {

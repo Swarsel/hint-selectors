@@ -36,13 +36,15 @@ function probe(rules: Site["rules"]) {
       !rule.match || rule.match.some((pattern) => match_pattern_regex(pattern).test(url));
     const fields = [
       ["include", rule.include],
+      ["exclude", rule.exclude],
       ...Object.entries(rule.sets ?? {}).map(([name, selector]) => [`sets.${name}`, selector]),
     ].filter((entry): entry is [string, string] => Boolean(entry[1]));
     for (const [field, list] of fields) {
       for (const selector of list.split(/,(?![^(]*\))/).map((part) => part.trim())) {
         const elements = matching(selector);
         for (const element of elements) {
-          (element as HTMLElement).style.outline = "2px solid magenta";
+          (element as HTMLElement).style.outline =
+            field === "exclude" ? "2px dashed red" : "2px solid magenta";
         }
         rows.push({ rule: index, applies, field, selector, matches: elements.length });
       }

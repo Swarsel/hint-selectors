@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { match_pattern_regex, merge_sites, resolve, type Sites } from "../src/resolve.ts";
+import {
+  apply_exclude,
+  match_pattern_regex,
+  merge_sites,
+  resolve,
+  type Sites,
+} from "../src/resolve.ts";
 
 describe("match_pattern_regex", () => {
   it("matches http and https for the * scheme", () => {
@@ -37,7 +43,12 @@ describe("resolve", () => {
   const sites: Sites = {
     "example.com": [
       { include: ".global" },
-      { match: ["*://www.example.com/watch*"], include: ".watch", sets: { primary: ".main" } },
+      {
+        match: ["*://www.example.com/watch*"],
+        include: ".watch",
+        exclude: ".ads",
+        sets: { primary: ".main" },
+      },
       { match: ["*://old.example.com/*"], sets: { primary: ".old" } },
     ],
     "sub.example.com": [{ sets: { primary: ".sub" } }],
@@ -59,6 +70,7 @@ describe("resolve", () => {
   it("combines include and merges sets across matching rules and files", () => {
     assert.deepEqual(resolve(sites, "https://www.example.com/watch?v=1#t=2"), {
       include: ".global, .watch",
+      exclude: ".ads",
       sets: { primary: ".main" },
     });
     assert.deepEqual(resolve(sites, "https://sub.example.com/"), {
@@ -67,8 +79,38 @@ describe("resolve", () => {
     });
   });
 
+  it("combines exclude and treats a rule with only exclude as a match", () => {
+    const only_exclude: Sites = { "ads.example": [{ exclude: "nav" }, { exclude: ".ad" }] };
+    assert.deepEqual(resolve(only_exclude, "https://ads.example/"), {
+      exclude: "nav, .ad",
+      sets: {},
+    });
+  });
+
+  it("omits include and exclude when no rule sets them", () => {
+    assert.deepEqual(resolve(sites, "https://old.example.com/"), {
+      include: ".global",
+      sets: { primary: ".old" },
+    });
+    assert.deepEqual(
+      resolve({ "plain.example": [{ sets: { primary: ".p" } }] }, "https://plain.example/"),
+      {
+        sets: { primary: ".p" },
+      },
+    );
+  });
+
   it("does not match lookalike domains", () => {
     assert.equal(resolve(sites, "https://notexample.com/"), null);
+  });
+});
+
+describe("apply_exclude", () => {
+  it("drops excluded elements and their descendants from a selector list", () => {
+    assert.equal(
+      apply_exclude("a, button", "nav, .ad"),
+      ":is(a, button):not(:is(nav, .ad), :is(nav, .ad) *)",
+    );
   });
 });
 
