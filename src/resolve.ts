@@ -127,3 +127,23 @@ export function resolve(sites: Sites, url: string): Resolved | null {
 export function apply_exclude(selector: string, exclude: string): string {
   return `:is(${selector}):not(:is(${exclude}), :is(${exclude}) *)`;
 }
+
+export type HintInfo = { hidden: boolean; href: string | null; text: boolean };
+
+function is_navigation(href: string): boolean {
+  return !href.startsWith("javascript:") && !href.endsWith("#");
+}
+
+export function filter_hints(infos: HintInfo[], dedupe = true): boolean[] {
+  const linked_by_text = new Set<string>();
+  if (dedupe) {
+    for (const { hidden, href, text } of infos) {
+      if (!hidden && text && href && is_navigation(href)) {
+        linked_by_text.add(href);
+      }
+    }
+  }
+  return infos.map(
+    ({ hidden, href, text }) => !hidden && !(href !== null && !text && linked_by_text.has(href)),
+  );
+}

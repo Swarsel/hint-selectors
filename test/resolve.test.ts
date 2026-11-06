@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   apply_exclude,
+  filter_hints,
   match_pattern_regex,
   merge_sites,
   resolve,
@@ -110,6 +111,40 @@ describe("apply_exclude", () => {
     assert.equal(
       apply_exclude("a, button", "nav, .ad"),
       ":is(a, button):not(:is(nav, .ad), :is(nav, .ad) *)",
+    );
+  });
+});
+
+describe("filter_hints", () => {
+  const avatar = { hidden: false, href: "https://example.com/user", text: false };
+  const name = { hidden: false, href: "https://example.com/user", text: true };
+  const lone_icon = { hidden: false, href: "https://example.com/other", text: false };
+  const button = { hidden: false, href: null, text: false };
+
+  it("drops hidden hints", () => {
+    assert.deepEqual(filter_hints([{ ...name, hidden: true }, name]), [false, true]);
+  });
+
+  it("drops image-only links whose target also has a text link", () => {
+    assert.deepEqual(filter_hints([avatar, name, lone_icon, button]), [false, true, true, true]);
+  });
+
+  it("keeps duplicates when dedupe is off", () => {
+    assert.deepEqual(filter_hints([avatar, name], false), [true, true]);
+  });
+
+  it("does not count hidden text links or non-navigating hrefs as duplicates", () => {
+    assert.deepEqual(filter_hints([avatar, { ...name, hidden: true }]), [true, false]);
+    const hash = "https://example.com/page#";
+    const script = "javascript:void(0)";
+    assert.deepEqual(
+      filter_hints([
+        { ...avatar, href: hash },
+        { ...name, href: hash },
+        { ...avatar, href: script },
+        { ...name, href: script },
+      ]),
+      [true, true, true, true],
     );
   });
 });

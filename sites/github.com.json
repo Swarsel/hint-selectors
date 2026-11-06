@@ -4,7 +4,7 @@
   "rules": [
     {
       "sets": {
-        "primary": "a.Link--primary:not(.author):not(.assignee), [data-listview-item-title-container] a, [class*=\"ActionList-ItemLabel\"], [class*=\"TreeView-item-content-text\"], a[itemprop=\"name codeRepository\"], .pinned-item-list-item a.Link, .search-title a, .Box-row h2 a, h3.f3 a.text-bold, a.width-full[href*=\"/actions/runs/\"], dialog a.ActionListContent"
+        "primary": ".GlobalNav a, .GlobalNav button, .AppHeader-globalBar a, .AppHeader-globalBar button, dialog [class*=\"ActionListItem-label\"], [role=\"dialog\"] [class*=\"ActionListItem-label\"], [class*=\"ActionList-ItemLabel\"], [data-filterable-for=\"dashboard-repos-filter-left\"] a, a.Link--primary:not(.author):not(.assignee), [data-listview-item-title-container] a, [class*=\"TreeView-item-content-text\"], a[itemprop=\"name codeRepository\"], .pinned-item-list-item a.Link, .search-title a, .Box-row h2 a, h3.f3 a.text-bold, a.width-full[href*=\"/actions/runs/\"]"
       }
     }
   ]

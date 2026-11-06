@@ -1,8 +1,10 @@
 import {
+  filter_hints,
   merge_sites,
   resolve,
   SET_NAMES,
   type Dataset,
+  type HintInfo,
   type SetName,
   type Sites,
 } from "../../src/resolve.ts";
@@ -16,11 +18,17 @@ type HintOptions = {
   action?: glide.HintAction;
 };
 
+type PickerOptions = {
+  exclude?: string;
+  dedupe?: boolean;
+};
+
 type HintSelectorsOptions = {
   keys?: {
     include?: Array<{ key: string; action?: glide.HintAction }>;
   } & Partial<Record<SetName, string>>;
   hint?: (opts: HintOptions) => void;
+  dedupe?: boolean;
   extra?: Sites;
   remote?: boolean | { url?: string; refresh_hours?: number };
 };
@@ -29,7 +37,7 @@ declare global {
   interface GlideGlobals {
     hint_selectors?: {
       setup(opts?: HintSelectorsOptions): void;
-      exclude_picker(exclude: string): glide.HintPicker;
+      picker(opts: PickerOptions): glide.HintPicker;
     };
   }
 }
@@ -37,6 +45,7 @@ declare global {
 const DEFAULT_REMOTE_URL =
   "https://raw.githubusercontent.com/Swarsel/hint-selectors/dist/selectors.json";
 const CACHE_PATH = glide.path.join(glide.path.profile_dir, "hint-selectors", "selectors.json");
+const HIDDEN_TEXT = ".sr-only, .visually-hidden, .visuallyhidden, .screen-reader-text";
 
 let remote_data: Dataset | null = null;
 let fetched_at = 0;
@@ -80,21 +89,35 @@ async function update(url: string) {
   await glide.fs.write(CACHE_PATH, JSON.stringify({ fetched_at, data }));
 }
 
-function exclude_picker(exclude: string): glide.HintPicker {
-  const source = `(element) => element.closest(${JSON.stringify(exclude)}) !== null`;
-  const excluded = (_element: HTMLElement): boolean => false;
-  excluded.toString = () => source;
+function picker({ exclude, dedupe = true }: PickerOptions): glide.HintPicker {
+  const hidden = exclude ? `element.closest(${JSON.stringify(exclude)}) !== null` : "false";
+  const source = `(element) => {
+  let text = element.innerText ?? element.textContent ?? "";
+  for (const node of element.querySelectorAll(${JSON.stringify(HIDDEN_TEXT)})) {
+    text = text.replace(node.innerText ?? node.textContent ?? "", "");
+  }
+  return {
+    hidden: ${hidden},
+    href: typeof element.href === "string" ? element.href : null,
+    text: text.trim() !== "",
+  };
+}`;
+  const describe = (_element: HTMLElement): HintInfo => ({ hidden: false, href: null, text: true });
+  describe.toString = () => source;
   return async ({ hints, content }) => {
-    const hidden = await content.map(excluded);
-    return hints.filter((_, index) => !hidden[index]);
+    const keep = filter_hints(await content.map(describe), dedupe);
+    return hints.filter((_, index) => keep[index]);
   };
 }
 
 function setup(opts: HintSelectorsOptions = {}) {
+  const dedupe = opts.dedupe ?? true;
   const hint =
     opts.hint ??
     (({ exclude, ...hint_opts }: HintOptions) =>
-      glide.hints.show(exclude ? { ...hint_opts, pick: exclude_picker(exclude) } : hint_opts));
+      glide.hints.show(
+        exclude || dedupe ? { ...hint_opts, pick: picker({ exclude, dedupe }) } : hint_opts,
+      ));
   const include_keys = opts.keys?.include ?? [{ key: "f" }, { key: "F", action: "newtab-click" }];
   const remote = opts.remote
     ? { url: DEFAULT_REMOTE_URL, refresh_hours: 24, ...opts.remote }
@@ -124,20 +147,19 @@ function setup(opts: HintSelectorsOptions = {}) {
       merge_sites(remote_data?.sites ?? BUNDLED.sites, opts.extra ?? {}),
       url,
     );
+    const include = resolved?.include;
+    const exclude = resolved?.exclude;
+    for (const { key, action } of include_keys) {
+      glide.buf.keymaps.set("normal", key, () => hint({ include, exclude, action }));
+    }
     if (!resolved) {
       return;
-    }
-    const { include, exclude } = resolved;
-    if (include || exclude) {
-      for (const { key, action } of include_keys) {
-        glide.buf.keymaps.set("normal", key, () => hint({ include, exclude, action }));
-      }
     }
     for (const name of SET_NAMES) {
       const key = opts.keys?.[name];
       const selector = resolved.sets[name];
       if (key && selector) {
-        glide.buf.keymaps.set("normal", key, () => hint({ selector }));
+        glide.buf.keymaps.set("normal", key, () => hint({ selector, exclude }));
       }
     }
   });
@@ -150,4 +172,4 @@ function setup(opts: HintSelectorsOptions = {}) {
   }
 }
 
-glide.g.hint_selectors = { setup, exclude_picker };
+glide.g.hint_selectors = { setup, picker };

@@ -21,7 +21,7 @@ Every domain is handled by a `sites/<domain>.json` file that holds all rules for
 ```
 
 - `include`: hinted in addition to the default hintable elements
-- `exclude`: removed from the default hintable elements and from `include`
+- `exclude`: removed from every hint set, together with everything inside
 - `sets.primary`: hinted exclusively, the main links of a page
 - `match`: optional [match patterns](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Match_patterns) limiting a rule to some pages
 
@@ -39,7 +39,8 @@ glide.include("hint-selectors.glide.ts").then(() => glide.g.hint_selectors!.setu
 
 #### Configuration
 
-By default, `f` and `F` show the default hints plus the site's `include`.
+By default, `f` and `F` show the default hints plus the site's `include`, minus its `exclude` and
+minus image-only links whose target also has a text link.
 
 `setup` can be customized:
 
@@ -47,6 +48,7 @@ By default, `f` and `F` show the default hints plus the site's `include`.
   action
 - `keys.primary`: key hinting only the `primary` set, unbound by default
 - `hint`: receives `{ selector?, include?, exclude?, action? }`, to route through your own hint function
+- `dedupe`: drop image-only links whose target also has a text link, on by default
 - `extra`: local rules, keyed by domain
 - `remote`: fetch updates instead of only using only the bundled data (off by default)
 
