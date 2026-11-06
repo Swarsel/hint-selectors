@@ -1,0 +1,220 @@
+{
+  "format": 1,
+  "sites": {
+    "arxiv.org": [
+      {
+        "match": [
+          "*://arxiv.org/list/*"
+        ],
+        "sets": {
+          "primary": "dt a[title=\"Abstract\"], dt a[title=\"Download PDF\"]"
+        }
+      },
+      {
+        "match": [
+          "*://arxiv.org/search/*"
+        ],
+        "sets": {
+          "primary": ".list-title a"
+        }
+      },
+      {
+        "match": [
+          "*://arxiv.org/abs/*"
+        ],
+        "sets": {
+          "primary": "a.abs-button"
+        }
+      }
+    ],
+    "askubuntu.com": [
+      {
+        "sets": {
+          "primary": ".s-post-summary--content-title a, a.question-hyperlink"
+        }
+      }
+    ],
+    "codeberg.org": [
+      {
+        "sets": {
+          "primary": "#repo-files-table td.name a, a.issue-title, a.text.primary.name"
+        }
+      }
+    ],
+    "crates.io": [
+      {
+        "sets": {
+          "primary": ".crate-spec a.name"
+        }
+      }
+    ],
+    "docs.rs": [
+      {
+        "match": [
+          "*://docs.rs/releases/*"
+        ],
+        "sets": {
+          "primary": "a.release"
+        }
+      }
+    ],
+    "duckduckgo.com": [
+      {
+        "sets": {
+          "primary": "a[data-testid=\"result-title-a\"], a.result__a:not(.related-searches__link)"
+        }
+      }
+    ],
+    "github.com": [
+      {
+        "sets": {
+          "primary": ".GlobalNav a, .GlobalNav button, .AppHeader-globalBar a, .AppHeader-globalBar button, dialog [class*=\"ActionListItem-label\"], [role=\"dialog\"] [class*=\"ActionListItem-label\"], [class*=\"ActionList-ItemLabel\"], [data-filterable-for=\"dashboard-repos-filter-left\"] a, a.Link--primary:not(.author):not(.assignee), [data-listview-item-title-container] a, [class*=\"TreeView-item-content-text\"], a[itemprop=\"name codeRepository\"], .pinned-item-list-item a.Link, .search-title a, .Box-row h2 a, h3.f3 a.text-bold, a.width-full[href*=\"/actions/runs/\"]"
+        }
+      }
+    ],
+    "gitlab.com": [
+      {
+        "sets": {
+          "primary": "a[data-testid=\"issuable-title-link\"], a[data-testid=\"file-name-link\"]"
+        }
+      }
+    ],
+    "google.com": [
+      {
+        "match": [
+          "*://www.google.com/search*"
+        ],
+        "sets": {
+          "primary": "#search a:has(> h3), a.fl, #pnnext"
+        }
+      }
+    ],
+    "haskell.org": [
+      {
+        "match": [
+          "*://hackage.haskell.org/*"
+        ],
+        "sets": {
+          "primary": "td a[href^=\"/package/\"]"
+        }
+      }
+    ],
+    "lobste.rs": [
+      {
+        "sets": {
+          "primary": "a.u-url, .comments_label > a, .morelink a, .comment .byline a[href^=\"/s/\"]"
+        }
+      }
+    ],
+    "mathoverflow.net": [
+      {
+        "sets": {
+          "primary": ".s-post-summary--content-title a, a.question-hyperlink"
+        }
+      }
+    ],
+    "nixos.org": [
+      {
+        "match": [
+          "*://search.nixos.org/*"
+        ],
+        "include": ".search-result-title a",
+        "sets": {
+          "primary": ".search-result-title a"
+        }
+      },
+      {
+        "match": [
+          "*://discourse.nixos.org/*"
+        ],
+        "sets": {
+          "primary": "a.raw-topic-link"
+        }
+      }
+    ],
+    "reddit.com": [
+      {
+        "sets": {
+          "primary": "a.title, a.bylink.comments, .tabmenu a, a[slot=\"title\"], a.post-link, a[data-testid=\"post-title\"]"
+        }
+      }
+    ],
+    "serverfault.com": [
+      {
+        "sets": {
+          "primary": ".s-post-summary--content-title a, a.question-hyperlink"
+        }
+      }
+    ],
+    "stackapps.com": [
+      {
+        "sets": {
+          "primary": ".s-post-summary--content-title a, a.question-hyperlink"
+        }
+      }
+    ],
+    "stackexchange.com": [
+      {
+        "sets": {
+          "primary": ".s-post-summary--content-title a, a.question-hyperlink"
+        }
+      }
+    ],
+    "stackoverflow.com": [
+      {
+        "sets": {
+          "primary": ".s-post-summary--content-title a, a.question-hyperlink"
+        }
+      }
+    ],
+    "superuser.com": [
+      {
+        "sets": {
+          "primary": ".s-post-summary--content-title a, a.question-hyperlink"
+        }
+      }
+    ],
+    "tildes.net": [
+      {
+        "sets": {
+          "primary": ".topic-title a, .topic-info-comments a"
+        }
+      }
+    ],
+    "wikipedia.org": [
+      {
+        "match": [
+          "*://*.wikipedia.org/w/index.php*"
+        ],
+        "sets": {
+          "primary": ".mw-search-result-heading a"
+        }
+      },
+      {
+        "match": [
+          "*://*.wikipedia.org/wiki/Category:*"
+        ],
+        "sets": {
+          "primary": "#mw-pages a, #mw-subcategories a"
+        }
+      }
+    ],
+    "ycombinator.com": [
+      {
+        "match": [
+          "*://news.ycombinator.com/*"
+        ],
+        "sets": {
+          "primary": ".titleline > a, .age > a, a.morelink"
+        }
+      }
+    ],
+    "youtube.com": [
+      {
+        "sets": {
+          "primary": "a#video-title-link, a#video-title, a.ytLockupMetadataViewModelTitle, a.shortsLockupViewModelHostOutsideMetadataEndpoint"
+        }
+      }
+    ]
+  }
+}
