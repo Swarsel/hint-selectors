@@ -112,7 +112,7 @@ function setup(opts: HintSelectorsOptions = {}) {
   const hint = opts.hint ?? ((hint_opts: HintOptions) => glide.hints.show(hint_opts));
   const include_keys = opts.keys?.include ?? [{ key: "f" }, { key: "F", action: "newtab-click" }];
   const remote = opts.remote
-    ? { url: DEFAULT_REMOTE_URL, refresh_hours: 24, ...opts.remote }
+    ? { url: DEFAULT_REMOTE_URL, refresh_hours: 24, ...(opts.remote === true ? {} : opts.remote) }
     : null;
   const cache_read = remote ? read_cache() : Promise.resolve();
 
