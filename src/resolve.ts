@@ -118,13 +118,15 @@ export function resolve(sites: Sites, url: string): Resolved | null {
 
 export type HintInfo = { hidden: boolean; href: string | null; text: boolean };
 
+export type Duplicates = "drop-duplicates" | "keep-duplicates";
+
 function is_navigation(href: string): boolean {
   return !href.startsWith("javascript:") && !href.endsWith("#");
 }
 
-export function filter_hints(infos: HintInfo[], dedupe = true): boolean[] {
+export function filter_hints(infos: HintInfo[], duplicates: Duplicates): boolean[] {
   const linked_by_text = new Set<string>();
-  if (dedupe) {
+  if (duplicates === "drop-duplicates") {
     for (const { hidden, href, text } of infos) {
       if (!hidden && text && href && is_navigation(href)) {
         linked_by_text.add(href);

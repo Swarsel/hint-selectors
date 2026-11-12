@@ -23,6 +23,8 @@ type PickerOptions = {
   dedupe?: boolean;
 };
 
+type Refresh = "if-stale" | "force";
+
 type HintSelectorsOptions = {
   keys?: {
     include?: Array<{ key: string; action?: glide.HintAction }>;
@@ -105,7 +107,10 @@ function picker({ exclude, dedupe = true }: PickerOptions): glide.HintPicker {
   const describe = (_element: HTMLElement): HintInfo => ({ hidden: false, href: null, text: true });
   describe.toString = () => source;
   return async ({ hints, content }) => {
-    const keep = filter_hints(await content.map(describe), dedupe);
+    const keep = filter_hints(
+      await content.map(describe),
+      dedupe ? "drop-duplicates" : "keep-duplicates",
+    );
     return hints.filter((_, index) => keep[index]);
   };
 }
@@ -124,13 +129,13 @@ function setup(opts: HintSelectorsOptions = {}) {
     : null;
   const cache_read = remote ? read_cache() : Promise.resolve();
 
-  function refresh(force = false) {
+  function refresh(mode: Refresh) {
     if (!remote || updating) {
       return updating ?? Promise.resolve();
     }
     updating = cache_read
       .then(() => {
-        if (force || Date.now() - fetched_at > remote.refresh_hours * 3_600_000) {
+        if (mode === "force" || Date.now() - fetched_at > remote.refresh_hours * 3_600_000) {
           return update(remote.url);
         }
       })
@@ -142,7 +147,7 @@ function setup(opts: HintSelectorsOptions = {}) {
   }
 
   glide.autocmds.create("UrlEnter", /^https?:\/\//, ({ url }) => {
-    void refresh();
+    void refresh("if-stale");
     const resolved = resolve(
       merge_sites(remote_data?.sites ?? BUNDLED.sites, opts.extra ?? {}),
       url,
@@ -167,7 +172,7 @@ function setup(opts: HintSelectorsOptions = {}) {
   if (remote) {
     glide.excmds.create(
       { name: "hint_selectors_update", description: "Fetch the latest hint selectors" },
-      () => refresh(true),
+      () => refresh("force"),
     );
   }
 }

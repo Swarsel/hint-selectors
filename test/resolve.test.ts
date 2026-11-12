@@ -107,28 +107,42 @@ describe("filter_hints", () => {
   const button = { hidden: false, href: null, text: false };
 
   it("drops hidden hints", () => {
-    assert.deepEqual(filter_hints([{ ...name, hidden: true }, name]), [false, true]);
+    assert.deepEqual(filter_hints([{ ...name, hidden: true }, name], "drop-duplicates"), [
+      false,
+      true,
+    ]);
   });
 
   it("drops image-only links whose target also has a text link", () => {
-    assert.deepEqual(filter_hints([avatar, name, lone_icon, button]), [false, true, true, true]);
+    assert.deepEqual(filter_hints([avatar, name, lone_icon, button], "drop-duplicates"), [
+      false,
+      true,
+      true,
+      true,
+    ]);
   });
 
-  it("keeps duplicates when dedupe is off", () => {
-    assert.deepEqual(filter_hints([avatar, name], false), [true, true]);
+  it("keeps duplicates when asked to", () => {
+    assert.deepEqual(filter_hints([avatar, name], "keep-duplicates"), [true, true]);
   });
 
   it("does not count hidden text links or non-navigating hrefs as duplicates", () => {
-    assert.deepEqual(filter_hints([avatar, { ...name, hidden: true }]), [true, false]);
+    assert.deepEqual(filter_hints([avatar, { ...name, hidden: true }], "drop-duplicates"), [
+      true,
+      false,
+    ]);
     const hash = "https://example.com/page#";
     const script = "javascript:void(0)";
     assert.deepEqual(
-      filter_hints([
-        { ...avatar, href: hash },
-        { ...name, href: hash },
-        { ...avatar, href: script },
-        { ...name, href: script },
-      ]),
+      filter_hints(
+        [
+          { ...avatar, href: hash },
+          { ...name, href: hash },
+          { ...avatar, href: script },
+          { ...name, href: script },
+        ],
+        "drop-duplicates",
+      ),
       [true, true, true, true],
     );
   });
