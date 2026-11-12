@@ -124,10 +124,6 @@ export function resolve(sites: Sites, url: string): Resolved | null {
   return resolved;
 }
 
-export function apply_exclude(selector: string, exclude: string): string {
-  return `:is(${selector}):not(:is(${exclude}), :is(${exclude}) *)`;
-}
-
 export type HintInfo = { hidden: boolean; href: string | null; text: boolean };
 
 function is_navigation(href: string): boolean {

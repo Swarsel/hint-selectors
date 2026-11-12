@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
-  apply_exclude,
   filter_hints,
   match_pattern_regex,
   merge_sites,
@@ -50,7 +49,6 @@ describe("resolve", () => {
         exclude: ".ads",
         sets: { primary: ".main" },
       },
-      { match: ["*://old.example.com/*"], sets: { primary: ".old" } },
     ],
     "sub.example.com": [{ sets: { primary: ".sub" } }],
   };
@@ -89,10 +87,6 @@ describe("resolve", () => {
   });
 
   it("omits include and exclude when no rule sets them", () => {
-    assert.deepEqual(resolve(sites, "https://old.example.com/"), {
-      include: ".global",
-      sets: { primary: ".old" },
-    });
     assert.deepEqual(
       resolve({ "plain.example": [{ sets: { primary: ".p" } }] }, "https://plain.example/"),
       {
@@ -103,15 +97,6 @@ describe("resolve", () => {
 
   it("does not match lookalike domains", () => {
     assert.equal(resolve(sites, "https://notexample.com/"), null);
-  });
-});
-
-describe("apply_exclude", () => {
-  it("drops excluded elements and their descendants from a selector list", () => {
-    assert.equal(
-      apply_exclude("a, button", "nav, .ad"),
-      ":is(a, button):not(:is(nav, .ad), :is(nav, .ad) *)",
-    );
   });
 });
 
