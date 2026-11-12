@@ -74,22 +74,24 @@ export function merge_sites(...all: Sites[]): Sites {
 }
 
 export function resolve(sites: Sites, url: string): Resolved | null {
-  const parts = /^(https?:\/\/)(?:[^@/?#]*@)?([^/:?#]+)/i.exec(url);
-  if (!parts) {
+  const target = URL.parse(url);
+  if (!target || !["http:", "https:"].includes(target.protocol)) {
     return null;
   }
-  const host = parts[2]!.toLowerCase();
-  const target = url.split("#")[0]!;
+  target.hash = "";
   const include: string[] = [];
   const exclude: string[] = [];
   const sets: Partial<Record<SetName, string[]>> = {};
   let matched = false;
   for (const [domain, rules] of Object.entries(sites)) {
-    if (!host_in_domain(host, domain)) {
+    if (!host_in_domain(target.hostname, domain)) {
       continue;
     }
     for (const rule of rules) {
-      if (rule.match && !rule.match.some((pattern) => match_pattern_regex(pattern).test(target))) {
+      if (
+        rule.match &&
+        !rule.match.some((pattern) => match_pattern_regex(pattern).test(target.href))
+      ) {
         continue;
       }
       matched = true;
