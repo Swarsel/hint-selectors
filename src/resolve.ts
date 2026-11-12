@@ -55,12 +55,10 @@ export function host_in_domain(host: string, domain: string): boolean {
   return host === domain || host.endsWith(`.${domain}`);
 }
 
-export function merge_sites(...all: Sites[]): Sites {
-  const merged: Sites = {};
-  for (const sites of all) {
-    for (const [domain, rules] of Object.entries(sites)) {
-      merged[domain] = [...(merged[domain] ?? []), ...rules];
-    }
+export function merge_sites(base: Sites, extra: Sites): Sites {
+  const merged = { ...base };
+  for (const [domain, rules] of Object.entries(extra)) {
+    merged[domain] = [...(merged[domain] ?? []), ...rules];
   }
   return merged;
 }
