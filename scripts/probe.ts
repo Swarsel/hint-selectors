@@ -1,6 +1,9 @@
 import { stripTypeScriptTypes } from "node:module";
+import { parse, stringify } from "css-what";
 import { match_pattern_regex } from "../src/resolve.ts";
 import { read_site_files, resolve_source, type Site } from "./sites.ts";
+
+type Field = { rule: number; match?: string[]; field: string; selectors: string[] };
 
 const domain = process.argv[2];
 const site = (await read_site_files())
@@ -12,7 +15,22 @@ if (!site) {
   process.exit(1);
 }
 
-function probe(rules: Site["rules"]) {
+const fields: Field[] = site.rules.flatMap((rule, index) =>
+  [
+    ["include", rule.include],
+    ["exclude", rule.exclude],
+    ...Object.entries(rule.sets ?? {}).map(([name, selector]) => [`sets.${name}`, selector]),
+  ]
+    .filter((entry): entry is [string, string] => Boolean(entry[1]))
+    .map(([field, list]) => ({
+      rule: index,
+      match: rule.match,
+      field,
+      selectors: parse(list).map((selector) => stringify([selector])),
+    })),
+);
+
+function probe(fields: Field[]) {
   function matching(selector: string): Element[] {
     const found: Element[] = [];
     const walk = (root: Document | ShadowRoot) => {
@@ -29,32 +47,25 @@ function probe(rules: Site["rules"]) {
     return found;
   }
 
-  const url = location.href.split("#")[0]!;
+  const url = new URL(location.href);
+  url.hash = "";
   const rows: Array<Record<string, unknown>> = [];
-  rules.forEach((rule, index) => {
-    const applies =
-      !rule.match || rule.match.some((pattern) => match_pattern_regex(pattern).test(url));
-    const fields = [
-      ["include", rule.include],
-      ["exclude", rule.exclude],
-      ...Object.entries(rule.sets ?? {}).map(([name, selector]) => [`sets.${name}`, selector]),
-    ].filter((entry): entry is [string, string] => Boolean(entry[1]));
-    for (const [field, list] of fields) {
-      for (const selector of list.split(/,(?![^(]*\))/).map((part) => part.trim())) {
-        const elements = matching(selector);
-        for (const element of elements) {
-          (element as HTMLElement).style.outline =
-            field === "exclude" ? "2px dashed red" : "2px solid magenta";
-        }
-        rows.push({ rule: index, applies, field, selector, matches: elements.length });
+  for (const { rule, match, field, selectors } of fields) {
+    const applies = !match || match.some((pattern) => match_pattern_regex(pattern).test(url.href));
+    for (const selector of selectors) {
+      const elements = matching(selector);
+      for (const element of elements) {
+        (element as HTMLElement).style.outline =
+          field === "exclude" ? "2px dashed red" : "2px solid magenta";
       }
+      rows.push({ rule, applies, field, selector, matches: elements.length });
     }
-  });
+  }
   console.table(rows);
 }
 
 const snippet = stripTypeScriptTypes(
-  `{\n${await resolve_source()}\n(${probe.toString()})(${JSON.stringify(site.rules)});\n}`,
+  `{\n${await resolve_source()}\n(${probe.toString()})(${JSON.stringify(fields)});\n}`,
 );
 console.error(
   `Open a ${site.domain} page, paste this into the devtools console and check the table:\n`,
