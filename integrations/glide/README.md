@@ -16,7 +16,7 @@ minus image-only links whose target also has a text link.
 - `keys.include`: keys showing the default hints plus `include` minus `exclude` + optional hint
   action
 - `keys.primary`: key hinting only the `primary` set, unbound by default
-- `hint`: receives `{ selector?, include?, exclude?, action? }`, to route through your own hint function
+- `hint`: receives `{ selector?, include?, exclude?, pick? }`, to route through your own hint function
 - `dedupe`: drop image-only links whose target also has a text link, on by default
 - `extra`: local rules, keyed by domain
 - `remote`: fetch updates instead of only using only the bundled data (off by default)
@@ -29,7 +29,7 @@ setup({
     include: [{ key: "f" }, { key: "F", action: "newtab-click" }],
     primary: "c",
   },
-  hint: ({ selector, include, action }) => start_hints({ selector, include, action }),
+  hint: ({ selector, include, action, pick }) => start_hints({ selector, include, action, pick }),
   extra: {
     "about.example": [{ include: ".clickable-row" }],
   },

@@ -4,6 +4,7 @@ import {
   resolve,
   SET_NAMES,
   type Dataset,
+  type Duplicates,
   type HintInfo,
   type SetName,
   type Sites,
@@ -14,13 +15,8 @@ const BUNDLED: Dataset = { format: 1, sites: {} };
 type HintOptions = {
   selector?: string;
   include?: string;
-  exclude?: string;
   action?: glide.HintAction;
-};
-
-type PickerOptions = {
-  exclude?: string;
-  dedupe?: boolean;
+  pick?: glide.HintPicker;
 };
 
 type Refresh = "if-stale" | "force";
@@ -39,7 +35,6 @@ declare global {
   interface GlideGlobals {
     hint_selectors?: {
       setup(opts?: HintSelectorsOptions): void;
-      picker(opts: PickerOptions): glide.HintPicker;
     };
   }
 }
@@ -91,7 +86,7 @@ async function update(url: string) {
   await glide.fs.write(CACHE_PATH, JSON.stringify({ fetched_at, data }));
 }
 
-function picker({ exclude, dedupe = true }: PickerOptions): glide.HintPicker {
+function picker(exclude: string | undefined, duplicates: Duplicates): glide.HintPicker {
   const hidden = exclude ? `element.closest(${JSON.stringify(exclude)}) !== null` : "false";
   const source = `(element) => {
   let text = element.innerText ?? element.textContent ?? "";
@@ -107,22 +102,14 @@ function picker({ exclude, dedupe = true }: PickerOptions): glide.HintPicker {
   const describe = (_element: HTMLElement): HintInfo => ({ hidden: false, href: null, text: true });
   describe.toString = () => source;
   return async ({ hints, content }) => {
-    const keep = filter_hints(
-      await content.map(describe),
-      dedupe ? "drop-duplicates" : "keep-duplicates",
-    );
+    const keep = filter_hints(await content.map(describe), duplicates);
     return hints.filter((_, index) => keep[index]);
   };
 }
 
 function setup(opts: HintSelectorsOptions = {}) {
-  const dedupe = opts.dedupe ?? true;
-  const hint =
-    opts.hint ??
-    (({ exclude, ...hint_opts }: HintOptions) =>
-      glide.hints.show(
-        exclude || dedupe ? { ...hint_opts, pick: picker({ exclude, dedupe }) } : hint_opts,
-      ));
+  const duplicates: Duplicates = opts.dedupe === false ? "keep-duplicates" : "drop-duplicates";
+  const hint = opts.hint ?? ((hint_opts: HintOptions) => glide.hints.show(hint_opts));
   const include_keys = opts.keys?.include ?? [{ key: "f" }, { key: "F", action: "newtab-click" }];
   const remote = opts.remote
     ? { url: DEFAULT_REMOTE_URL, refresh_hours: 24, ...opts.remote }
@@ -153,9 +140,9 @@ function setup(opts: HintSelectorsOptions = {}) {
       url,
     );
     const include = resolved?.include;
-    const exclude = resolved?.exclude;
+    const pick = picker(resolved?.exclude, duplicates);
     for (const { key, action } of include_keys) {
-      glide.buf.keymaps.set("normal", key, () => hint({ include, exclude, action }));
+      glide.buf.keymaps.set("normal", key, () => hint({ include, action, pick }));
     }
     if (!resolved) {
       return;
@@ -164,7 +151,7 @@ function setup(opts: HintSelectorsOptions = {}) {
       const key = opts.keys?.[name];
       const selector = resolved.sets[name];
       if (key && selector) {
-        glide.buf.keymaps.set("normal", key, () => hint({ selector, exclude }));
+        glide.buf.keymaps.set("normal", key, () => hint({ selector, pick }));
       }
     }
   });
@@ -177,4 +164,4 @@ function setup(opts: HintSelectorsOptions = {}) {
   }
 }
 
-glide.g.hint_selectors = { setup, picker };
+glide.g.hint_selectors = { setup };
