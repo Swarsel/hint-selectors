@@ -68,7 +68,7 @@
               '';
               nodejs = pkgs.nodejs_24;
               npmBuildScript = "build";
-              npmDepsHash = "sha256-9sq73q+tMheFawZtgSNzj5RqPHRevtC/Wl6Jcj5JTaQ=";
+              npmDepsHash = "sha256-rbqihqE7M3orYKiUXPYFUCO4p1oQZ5F56DNQvfu+wfk=";
               pname = "hint-selectors";
               src = lib.fileset.toSource {
                 fileset = lib.fileset.unions [
