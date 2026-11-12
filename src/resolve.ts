@@ -1,4 +1,6 @@
-export type SetName = "primary";
+export const SET_NAMES = ["primary"] as const;
+
+export type SetName = (typeof SET_NAMES)[number];
 
 export type Rule = {
   match?: string[];
@@ -16,8 +18,6 @@ export type Resolved = {
   exclude?: string;
   sets: Partial<Record<SetName, string>>;
 };
-
-export const SET_NAMES: SetName[] = ["primary"];
 
 const MATCH_PATTERN = /^(\*|https?):\/\/(\*|(?:\*\.)?[^/*:]+)(\/.*)$/;
 
