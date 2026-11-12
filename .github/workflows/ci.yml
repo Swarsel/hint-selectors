@@ -8,22 +8,16 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: cachix/install-nix-action@v31
-      - run: nix flake check -L
-
-  publish:
-    needs: check
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v31
-      - run: nix build -L .#hint-selectors
+      - run: nix flake check -L
+      - if: github.event_name == 'push'
+        run: nix build -L .#hint-selectors
       - name: Publish dist branch
+        if: github.event_name == 'push'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -37,10 +31,3 @@ jobs:
             -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -q -m "dist: built from ${GITHUB_SHA}"
           git push --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" dist
-      - name: Update the latest release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release view latest >/dev/null 2>&1 ||
-            gh release create latest --title latest --notes "Rebuilt from main on every push." --latest
-          gh release upload latest result/selectors.json result/hint-selectors.glide.ts --clobber
