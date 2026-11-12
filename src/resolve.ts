@@ -21,8 +21,6 @@ export type Resolved = {
 
 const MATCH_PATTERN = /^(\*|https?):\/\/(\*|(?:\*\.)?[^/*:]+)(\/.*)$/;
 
-const pattern_cache = new Map<string, RegExp>();
-
 function escape_regex(text: string): string {
   return text.replace(/[.+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -40,10 +38,6 @@ export function parse_match_pattern(pattern: string): {
 }
 
 export function match_pattern_regex(pattern: string): RegExp {
-  const cached = pattern_cache.get(pattern);
-  if (cached) {
-    return cached;
-  }
   const { scheme, host, path } = parse_match_pattern(pattern);
   const host_regex =
     host === "*"
@@ -51,12 +45,10 @@ export function match_pattern_regex(pattern: string): RegExp {
       : host.startsWith("*.")
         ? `(?:[^/:]+\\.)?${escape_regex(host.slice(2))}`
         : escape_regex(host);
-  const regex = new RegExp(
+  return new RegExp(
     `^${scheme === "*" ? "https?" : scheme}://${host_regex}(?::\\d+)?${path.split("*").map(escape_regex).join(".*")}$`,
     "i",
   );
-  pattern_cache.set(pattern, regex);
-  return regex;
 }
 
 export function host_in_domain(host: string, domain: string): boolean {
